@@ -1,0 +1,182 @@
+{
+  "findings": [
+    {
+      "requirement": {
+        "id": "required-1",
+        "text": "Python scripting",
+        "category": "required",
+        "priority": "required",
+        "scoreCategory": "required",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "matched",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [
+        "Fictional software analyst with 3 years of Python and SQL experience",
+        "Built Python and SQL inventory tools and reviewed data quality",
+        "Python scripting"
+      ],
+      "explanation": "The resume contains direct phrase or synonym evidence for the identifiable parts of this requirement."
+    },
+    {
+      "requirement": {
+        "id": "required-2",
+        "text": "SQL queries",
+        "category": "required",
+        "priority": "required",
+        "scoreCategory": "required",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "matched",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [
+        "Fictional software analyst with 3 years of Python and SQL experience",
+        "Built Python and SQL inventory tools and reviewed data quality",
+        "SQL queries"
+      ],
+      "explanation": "The resume contains direct phrase or synonym evidence for the identifiable parts of this requirement."
+    },
+    {
+      "requirement": {
+        "id": "required-3",
+        "text": "Git version control",
+        "category": "required",
+        "priority": "required",
+        "scoreCategory": "required",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "matched",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [
+        "Documented workflows with Git",
+        "Git version control"
+      ],
+      "explanation": "The resume contains direct phrase or synonym evidence for the identifiable parts of this requirement."
+    },
+    {
+      "requirement": {
+        "id": "required-5",
+        "text": "5 years of Python experience",
+        "category": "required",
+        "priority": "required",
+        "scoreCategory": "required",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "partially_matched",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [
+        "Fictional software analyst with 3 years of Python and SQL experience",
+        "Built Python and SQL inventory tools and reviewed data quality",
+        "Python scripting"
+      ],
+      "explanation": "The resume states 3 years, below the 5 years requested."
+    },
+    {
+      "requirement": {
+        "id": "required-12",
+        "text": "Automated software testing",
+        "category": "required",
+        "priority": "required",
+        "scoreCategory": "required",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "partially_matched",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [
+        "Fictional software analyst with 3 years of Python and SQL experience",
+        "Software Analyst",
+        "Completed software engineering degree"
+      ],
+      "explanation": "Only part of the requirement's identifiable evidence was found."
+    },
+    {
+      "requirement": {
+        "id": "preferred-6",
+        "text": "Docker",
+        "category": "preferred",
+        "priority": "preferred",
+        "scoreCategory": "preferred",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "not_found",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [],
+      "explanation": "No matching phrase or explicit synonym was found in the extracted resume text."
+    },
+    {
+      "requirement": {
+        "id": "responsibilities-10",
+        "text": "Validate inventory data and document workflows",
+        "category": "responsibilities",
+        "priority": "unspecified",
+        "scoreCategory": "responsibilities",
+        "classificationNeedsReview": false
+      },
+      "automaticStatus": "partially_matched",
+      "reviewedStatus": null,
+      "reviewedPriority": null,
+      "evidenceExcerpts": [
+        "Built reliable inventory tools",
+        "Built Python and SQL inventory tools and reviewed data quality",
+        "Improved classroom inventory validation by 20%",
+        "Fictional project: Café inventory & reporting",
+        "Documented workflows with Git"
+      ],
+      "explanation": "Only part of the requirement's identifiable evidence was found."
+    }
+  ],
+  "scorePercent": 59,
+  "scoreExplanation": "Matched = 1, partially matched = 0.5, and not found = 0. Category averages use weights 60% required, 20% preferred, 15% skills, and 5% responsibilities. Empty categories are removed and remaining weights are normalized; needs-review items are excluded. 7 requirements were scored.",
+  "counts": {
+    "matched": 3,
+    "partially_matched": 3,
+    "not_found": 1,
+    "needs_review": 0
+  },
+  "strengths": [
+    {
+      "requirement": "Python scripting",
+      "evidence": "Fictional software analyst with 3 years of Python and SQL experience"
+    },
+    {
+      "requirement": "SQL queries",
+      "evidence": "Fictional software analyst with 3 years of Python and SQL experience"
+    },
+    {
+      "requirement": "Git version control",
+      "evidence": "Documented workflows with Git"
+    }
+  ],
+  "gaps": [
+    {
+      "requirement": "5 years of Python experience",
+      "priority": "required",
+      "status": "partially_matched"
+    },
+    {
+      "requirement": "Automated software testing",
+      "priority": "required",
+      "status": "partially_matched"
+    },
+    {
+      "requirement": "Docker",
+      "priority": "preferred",
+      "status": "not_found"
+    },
+    {
+      "requirement": "Validate inventory data and document workflows",
+      "priority": "unspecified",
+      "status": "partially_matched"
+    }
+  ],
+  "nextSteps": [
+    "Clarify the scope, level, or duration of partially supported experience when you can substantiate those details.",
+    "Review the relevant sections of your resume. Add truthful evidence only if you have the experience; otherwise consider whether training or a qualification would help."
+  ]
+}

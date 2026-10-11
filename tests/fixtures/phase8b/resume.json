@@ -1,0 +1,51 @@
+{
+  "contact": {
+    "name": "Morgan Reed (Fictional)",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "website": ""
+  },
+  "summary": "Fictional software analyst with 3 years of Python and SQL experience. Built reliable inventory tools.",
+  "experience": [
+    {
+      "id": "exp",
+      "jobTitle": "Software Analyst",
+      "employer": "Fictional Lantern Labs",
+      "location": "Fictional City",
+      "dates": "2022 - 2025",
+      "description": "Built Python and SQL inventory tools and reviewed data quality.",
+      "bullets": [
+        "Documented workflows with Git.",
+        "Improved classroom inventory validation by 20%."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu",
+      "qualification": "Bachelor of Computer Science",
+      "institution": "Fictional Meridian College",
+      "location": "Fictional City",
+      "dates": "2022",
+      "details": "Completed software engineering degree."
+    }
+  ],
+  "skills": [
+    {
+      "id": "python",
+      "text": "Python scripting"
+    },
+    {
+      "id": "sql",
+      "text": "SQL queries"
+    },
+    {
+      "id": "git",
+      "text": "Git version control"
+    }
+  ],
+  "certifications": [],
+  "projects": [],
+  "additionalInformation": "Fictional project: Café inventory & reporting."
+}

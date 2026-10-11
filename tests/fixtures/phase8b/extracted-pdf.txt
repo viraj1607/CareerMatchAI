@@ -1,0 +1,21 @@
+Morgan Reed (Fictional)
+PROFESSIONAL SUMMARY
+Fictional software analyst with 3 years of Python and SQL experience. Built reliable inventory tools.
+WORK EXPERIENCE
+Software Analyst
+Fictional Lantern Labs
+Fictional City | 2022 - 2025
+Built Python and SQL inventory tools and reviewed data quality.
+• Documented workflows with Git.
+• Improved classroom inventory validation by 20%.
+EDUCATION
+Bachelor of Computer Science
+Fictional Meridian College
+Fictional City | 2022
+Completed software engineering degree.
+SKILLS
+Python scripting · SQL queries · Git version control
+ADDITIONAL INFORMATION
+Fictional project: Café inventory & reporting.
+
+Page 1 of 1

@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  background: #f5f7f5;
+  color: #1b2922;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
+}
+
+main { overflow-wrap: anywhere; }
+
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid #176b50;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .resume-paper { padding: 20px; overflow-wrap: anywhere; }
+}
+
+@layer components {
+  .form-control {
+    @apply w-full rounded-md border border-[#ced9d1] bg-white px-3 py-2.5 text-sm text-[#25372d] placeholder:text-[#65756b] focus:border-[#176b50] focus:outline-none focus:ring-2 focus:ring-[#176b50]/20 disabled:cursor-not-allowed disabled:bg-[#f2f5f3];
+  }
+}
+
+.resume-paper {
+  min-height: 620px;
+  padding: 42px;
+  border: 1px solid #e0e8e2;
+  border-radius: 4px;
+  background: #fff;
+  color: #28382e;
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.48;
+  box-shadow: 0 2px 9px rgb(31 52 41 / 6%);
+}
+
+.resume-paper h1 {
+  margin: 0 0 5px;
+  color: #1f3429;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.resume-paper .resume-contact {
+  margin: 0 0 22px;
+  color: #627067;
+  font-size: 10px;
+}
+
+.resume-preview-section {
+  margin-top: 17px;
+  break-inside: avoid;
+}
+
+.resume-preview-section h3 {
+  margin: 0 0 7px;
+  border-bottom: 1px solid #dce6df;
+  padding-bottom: 4px;
+  color: #176b50;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  break-after: avoid;
+}
+
+.resume-preview-section p {
+  margin: 0 0 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.resume-preview-section ul {
+  margin: 3px 0 0;
+  padding-left: 19px;
+  list-style: disc;
+}
+
+.resume-preview-section li {
+  margin: 0 0 4px;
+  break-inside: avoid;
+}
+
+.resume-entry {
+  break-inside: avoid;
+}
+
+.resume-entry-title {
+  font-weight: 700;
+}
+
+.resume-paper .resume-meta {
+  color: #65736a;
+  font-size: 10px;
+}
+
+.resume-empty {
+  color: #839087;
+}
+
+@media print {
+  @page { size: Letter; margin: 0.55in; }
+  body * { visibility: hidden !important; }
+  .resume-print-target,
+  .resume-print-target * { visibility: visible !important; }
+  .resume-print-target {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
 }

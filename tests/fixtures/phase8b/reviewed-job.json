@@ -1,0 +1,60 @@
+{
+  "jobTitle": "Software Analyst",
+  "sections": {
+    "required": [
+      {
+        "id": "required-1",
+        "text": "Python scripting"
+      },
+      {
+        "id": "required-2",
+        "text": "SQL queries"
+      },
+      {
+        "id": "required-3",
+        "text": "Git version control"
+      },
+      {
+        "id": "required-5",
+        "text": "5 years of Python experience"
+      },
+      {
+        "id": "required-12",
+        "text": "Automated software testing"
+      }
+    ],
+    "preferred": [
+      {
+        "id": "preferred-6",
+        "text": "Docker"
+      }
+    ],
+    "skills": [
+      {
+        "id": "skills-7",
+        "text": "SQL"
+      },
+      {
+        "id": "skills-8",
+        "text": "Python"
+      },
+      {
+        "id": "skills-9",
+        "text": "Git"
+      }
+    ],
+    "responsibilities": [
+      {
+        "id": "responsibilities-10",
+        "text": "Validate inventory data and document workflows"
+      }
+    ],
+    "experienceEducation": [
+      {
+        "id": "experienceEducation-11",
+        "text": "5 years of Python experience"
+      }
+    ],
+    "needsReview": []
+  }
+}

@@ -1,0 +1,12 @@
+Software Analyst
+Fictional Lantern Labs
+Required qualifications
+- Python scripting
+- SQL queries
+- Git version control
+- Kubernetes administration
+- 5 years of Python experience
+Preferred skills
+- Docker
+Responsibilities
+- Validate inventory data and document workflows
