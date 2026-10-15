@@ -4,6 +4,49 @@ import { test } from "node:test";
 import { isStrongEnoughPassword, isValidEmail, safeInternalPath, validatedHttpUrl } from "../src/lib/auth-validation";
 import { runAuthWorkflow, runSignOut, type AuthDriver } from "../src/lib/auth-workflow";
 import { savedDataQuotaMessage } from "../src/lib/saved-data-errors";
+import { AuthClient } from "@supabase/supabase-js";
+
+test("installed Auth SDK exchanges a recovery-page PKCE code before updating a password (offline)", async () => {
+  const descriptors = new Map(["window", "document", "BroadcastChannel"].map((key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  const location = { href: "https://careermatch.invalid/auth/update-password?code=fictional-code" };
+  const storage = new Map([["offline-recovery-code-verifier", JSON.stringify("fictional-verifier/PASSWORD_RECOVERY")]]);
+  const requests: string[] = [];
+  const user = { id: "fictional-user", aud: "authenticated", email: "fictional@example.invalid" };
+  const token = ["eyJhbGciOiJIUzI1NiJ9", Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600, sub: user.id })).toString("base64url"), "fictional-signature"].join(".");
+  let client: InstanceType<typeof AuthClient> | undefined;
+  try {
+    Object.defineProperty(globalThis, "window", { configurable: true, value: { location, history: { state: null, replaceState: (_state: unknown, _title: string, url: string) => { location.href = url; } }, addEventListener() {}, removeEventListener() {} } });
+    Object.defineProperty(globalThis, "document", { configurable: true, value: { visibilityState: "visible", addEventListener() {}, removeEventListener() {} } });
+    Object.defineProperty(globalThis, "BroadcastChannel", { configurable: true, value: undefined });
+    client = new AuthClient({
+      url: "https://supabase.invalid/auth/v1", flowType: "pkce", detectSessionInUrl: true,
+      autoRefreshToken: false, persistSession: true, storageKey: "offline-recovery",
+      storage: { getItem: (key) => storage.get(key) ?? null, setItem: (key, value) => { storage.set(key, value); }, removeItem: (key) => { storage.delete(key); } },
+      fetch: async (input, init) => {
+        const url = new URL(String(input)); requests.push(`${init?.method} ${url.pathname}`);
+        if (url.pathname.endsWith("/token")) {
+          assert.equal(url.searchParams.get("grant_type"), "pkce");
+          assert.equal(JSON.parse(String(init?.body)).code_verifier, "fictional-verifier");
+          return Response.json({ access_token: token, refresh_token: "fictional-refresh", expires_in: 3600, token_type: "bearer", user });
+        }
+        assert.equal(url.pathname, "/auth/v1/user");
+        assert.equal(init?.method, "PUT");
+        return Response.json(user);
+      },
+    });
+    const result = await client.updateUser({ password: "fictional-new-password-42" });
+    assert.equal(result.error, null);
+    assert.deepEqual(requests, ["POST /auth/v1/token", "PUT /auth/v1/user"]);
+    assert.equal(new URL(location.href).searchParams.has("code"), false);
+    assert.equal(storage.has("offline-recovery-code-verifier"), false);
+  } finally {
+    client?.stopAutoRefresh();
+    for (const [key, descriptor] of descriptors) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
+  }
+});
 
 test("recognized record quota provides actionable guidance without retry advice", () => {
   const message = savedDataQuotaMessage({ code: "23514", message: "Account record quota exceeded" });
@@ -136,7 +179,7 @@ test("workspace layout uses a server-side user check before rendering protected 
   const layout = await readFile(new URL("../src/app/(workspace)/layout.tsx", import.meta.url), "utf8");
   const serverClient = await readFile(new URL("../src/lib/supabase/server.ts", import.meta.url), "utf8");
   const sessionClient = await readFile(new URL("../src/lib/supabase/session.server.ts", import.meta.url), "utf8");
-  const proxy = await readFile(new URL("../proxy.ts", import.meta.url), "utf8");
+  const proxy = await readFile(new URL("../src/proxy.ts", import.meta.url), "utf8");
   assert.match(layout, /await requireUser\(\)/);
   assert.match(serverClient, /getAuthenticatedContext/);
   assert.match(sessionClient, /supabase\.auth\.getUser\(\)/);

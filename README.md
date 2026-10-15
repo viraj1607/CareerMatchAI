@@ -1,6 +1,6 @@
 # CareerMatch AI
 
-A Next.js workspace for Canadian job seekers to compare resumes with job descriptions, edit a job-tailored resume, and export PDF/DOCX files. It includes server-side document extraction, deterministic matching, optional consent-based Gemini analysis, and optional account-backed saved work through Supabase Auth and PostgreSQL. Supabase is not provisioned by this repository; account features require your own project configuration.
+A Next.js workspace for Canadian job seekers to compare resumes with job descriptions, edit a job-tailored resume, and export PDF/DOCX files. It includes server-side document extraction, deterministic matching, optional consent-based Gemini analysis, and account-backed saved work through Supabase Auth and PostgreSQL. Supabase is not provisioned by this repository; protected workspace pages and parsing/export APIs require configured authentication. Deterministic matching itself does not require Gemini.
 
 ## Requirements
 
@@ -55,6 +55,18 @@ GEMINI_MODEL=gemini-3.5-flash-lite
 
 AI analysis is optional and requires an unchecked-by-default consent checkbox each time the resume, job description, or reviewed requirements change. The consent disclosure explains that extracted resume text and the job description are submitted to Google's Gemini API. Provider data handling and retention depend on Google's current terms and billing tier, which CareerMatch AI cannot guarantee. Avoid unnecessary sensitive personal information. The app does not persist these texts or log them, and AI output never changes the deterministic score. Provider calls are server-side, inputs and responses are size/schema checked, and excerpts are shown only when verified against the resume text.
 
+## Public portfolio demo mode
+
+This repository can render a presentation-only portfolio demo without exposing the authenticated workspace. It is disabled by default. Enable it only on a separate public deployment by setting the server-side variable below exactly as shown:
+
+```dotenv
+CAREERMATCH_PORTFOLIO_DEMO=true
+```
+
+When enabled, only `/portfolio` renders. Every other application page, including sign-in and protected workspace pages, redirects to `/portfolio`. Every `/api` route returns a generic 404 before it can refresh a Supabase session or invoke document parsing, exports, saved-data writes, or Gemini. Visitors can switch between fixed fictional candidates and job postings; the illustrative score is calculated locally with the deterministic matcher and is never saved or sent anywhere. The page contains fictional sample content and the notice: “Portfolio demo — fictional data only. Do not submit real resumes or personal information.”
+
+Do not enable this flag on local development or the protected staging deployment. A separate portfolio deployment does not need Supabase or Gemini variables because the portfolio route does not use either service. Keep the flag absent or `false` everywhere the normal authenticated product must remain available.
+
 ## Resume editor and export
 
 After extracting a resume, choose **Edit and export resume**, or open **Resume editor** from the sidebar to start a blank draft. The editor lives in in-memory workspace state so it survives navigation between Analyze resume and Resume editor, but refreshing or closing the tab clears it. Imported text is organized conservatively by common section headings; uncertain work and education details remain editable as raw section text for you to organize. The untouched source is preserved separately, and reset requires confirmation.
@@ -69,7 +81,7 @@ Automated tests call the analysis service with mocked provider functions, use fi
 
 1. Create a Supabase project in the Supabase dashboard. CareerMatch AI does not create or assume a project, and no service-role key is needed for normal app use.
 2. Copy `.env.example` to `.env.local`. Set `NEXT_PUBLIC_SUPABASE_URL` to the project's API URL and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to its publishable key. Older projects may use `NEXT_PUBLIC_SUPABASE_ANON_KEY` instead. These are public client keys; database access is restricted by RLS. Never put a service-role or secret key in a `NEXT_PUBLIC_` variable.
-3. Install/use the Supabase CLI and initialize/link this folder if it is not linked: `npx supabase init`, `npx supabase login`, then `npx supabase link --project-ref YOUR_PROJECT_REF`. Apply the checked-in migration with `npx supabase db push`. Alternatively, review and run `supabase/migrations/202610090001_phase7_user_data.sql` in the project's SQL Editor. Do not run the migration twice manually after it has been applied.
+3. Before any schema operation, inspect the intended project identity and remote migration history. Review all four files in `supabase/migrations` in order: user data, Gemini rate limits, private-data limits, then signup-function execute hardening. Existing development migration versions differ from local filename versions; matching names alone does not authorize replay. Prepare a target-specific SQL/history plan and obtain approval before applying anything. The app does not apply migrations. Do not blindly run `supabase db push` or replay SQL on an initialized project.
 4. In **Authentication → URL Configuration**, set the local Site URL to `http://localhost:3000` and add `http://localhost:3000/auth/callback` and `http://localhost:3000/auth/update-password` to allowed redirect URLs. Add the equivalent URLs for your own production host only when you configure one.
 5. In **Authentication → Providers → Email**, enable email/password and email confirmations as appropriate. Configure SMTP before relying on production confirmation and password-recovery emails. Confirmation and recovery require the allowed redirect URLs above.
 6. Restart `npm run dev`, open `/auth`, create an account, and confirm the email if enabled. Account data pages are server-guarded; missing or expired sessions return to sign-in.
@@ -118,18 +130,11 @@ The parse and export APIs require a valid server-verified Supabase session. They
 
 Gemini analysis and suggestions require the Supabase shared rate-limit migration below. Per-user, per-feature request counts are stored in the existing Supabase PostgreSQL project, with a fixed one-minute bucket and a database-enforced maximum of five requests per scope. `CAREERMATCH_GEMINI_ANALYZE_LIMIT` and `CAREERMATCH_GEMINI_SUGGEST_LIMIT` can lower the application limits (1-5); the database limit cannot be raised from the client. If the migration/RPC is unavailable, the endpoints fail closed with `503` and do not call Gemini. This adds no external rate-limit service or paid resource, but it does depend on the existing Supabase project being reachable.
 
-Apply the checked-in migrations only after reviewing them and verifying the Supabase project/ref:
-
-```sh
-npx supabase link --project-ref YOUR_PROJECT_REF
-npx supabase db push
-```
-
-This applies pending migrations, including `202610100001_gemini_rate_limits.sql` and `202610100002_private_data_limits.sql`; do not run SQL snippets twice manually after applying them. No migration is applied by the app.
+The checked-in migrations include `202610100001_gemini_rate_limits.sql` and `202610100002_private_data_limits.sql`. Their presence does not establish what is pending remotely. Review project/ref, remote history, existing objects and the exact proposed operations before requesting schema approval. Do not run SQL snippets twice or blanket-push differing historical migration identifiers. No migration is applied by the app.
 
 The data-limits migration adds `NOT VALID` byte-size checks (512 KiB per structured resume version, 256 KiB reviewed requirements, 512 KiB deterministic analysis result, 256 KiB AI context), plus an account quota of 200 saved records and 50 MiB of serialized saved rows across resumes, jobs, analyses, and applications. The checks do not scan or delete existing rows during migration. Existing rows remain readable; a future update to a row that violates a new check will be rejected until that row is reduced. The account quota trigger also checks the user's total after each insert/update; if existing records already exceed the quota, further writes/updates for that account may be rejected until the user deletes or reduces saved data. Review existing record sizes/counts before applying, then audit and validate the `NOT VALID` constraints in a separately reviewed follow-up migration when data is within bounds. Deletions remain available. These initial limits are operational defaults, not a claim about all future product needs.
 
-`proxy.ts` applies a fresh nonce-based CSP, frame restrictions, `nosniff`, Referrer Policy, and a restrictive Permissions Policy to matched requests. The CSP permits browser connections only to the app and configured Supabase origin (plus its WebSocket origin); Gemini calls are server-side. Production HSTS is emitted by the app only when `NODE_ENV=production`; deploy behind HTTPS, ensure TLS is active before relying on HSTS, and add `includeSubDomains` only after every subdomain is HTTPS-ready. Review CSP reports in the actual hosting/auth setup before deployment. Inline styles remain permitted for the current Next/Tailwind interface; script execution is nonce-based.
+`src/proxy.ts` applies a fresh nonce-based CSP, frame restrictions, `nosniff`, Referrer Policy, and a restrictive Permissions Policy to matched requests. The CSP permits browser connections only to the app and configured Supabase origin (plus its WebSocket origin); Gemini calls are server-side. Production HSTS is emitted by the app only when `NODE_ENV=production`; deploy behind HTTPS, ensure TLS is active before relying on HSTS, and add `includeSubDomains` only after every subdomain is HTTPS-ready. Review CSP reports in the actual hosting/auth setup before deployment. Inline styles remain permitted for the current Next/Tailwind interface; script execution is nonce-based.
 
 ## Pages
 
@@ -144,7 +149,15 @@ The data-limits migration adds `NOT VALID` byte-size checks (512 KiB per structu
 
 The remaining preferences and interview preparation preview are not persisted/generated. Resume files are uploaded only to the parsing route, processed in memory, and discarded after the request. Job description analysis and deterministic matching run locally in the browser. Once explicitly saved, text, structured resume content, job descriptions, deterministic results, and optional AI context are stored in Supabase PostgreSQL under the authenticated account's RLS. Optional Gemini analysis and resume editing suggestions still require separate consent. The importer and matching engine use heuristics, so review extracted sections, evidence, and every AI proposal. OCR and interview question generation are not included.
 
-The project has no configured Supabase URL/key, so authentication, password email delivery, SQL migration application, live RLS behavior, and account deletion cannot be exercised until you configure a Supabase project. Mock/static tests do not replace the live RLS procedure above. Local npm tooling must be available to install dependencies and run checks. The SSR adapter is still published as a pre-1.0 package; pin and review upgrades when updating dependencies.
+Configuration is environment-specific and secrets are not part of this repository. Development and protected staging have historical live verification; that does not establish a new checkout's configuration or real-user production readiness. Signup/PKCE, recovery and complete hosted workflows still need separately approved verification. Mock/static tests do not replace live RLS tests. Local Node/npm tooling must be available to install dependencies and run checks. The SSR adapter is still published as a pre-1.0 package; pin and review upgrades when updating dependencies.
+
+## Repository checks and deployment boundaries
+
+`.github/workflows/checks.yml` runs locked installation, lint, offline tests, production build, serialized typecheck and `npm audit`. It contains no deployment command, service credentials, service setup or write permission. The known moderate dependency findings intentionally fail the audit gate; no threshold is relaxed. Adding this file locally does not change GitHub settings or execute Actions; a later push may run the workflow and consume the account's Actions allowance.
+
+Build/typecheck must not run concurrently because Next.js regenerates `.next/types`. Tests use fictional inputs and mocks, not live Gemini or Supabase calls. A successful build is not a production release approval.
+
+Keep protected staging private and separate real-user production from the fictional development database. Vercel function payload limits require an explicitly reviewed hosted upload cap; the existing staging plan uses 4000000 bytes rather than the local 5 MiB default. Auth redirects are built from browser/request origin; no application-URL environment variable is currently consumed. Configure exact approved Auth URLs externally only with authorization.
 
 PDFKit's built-in Helvetica font covers common Western punctuation and Canadian French accents; very uncommon scripts or emoji may not be representable in PDF output. Word documents use Arial as a widely available font, with viewer-specific font substitution possible.
 

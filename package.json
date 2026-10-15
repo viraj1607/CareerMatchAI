@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --conditions=react-server --import tsx --test tests/document-parser.test.ts tests/resume-route.test.ts tests/job-description-analysis.test.ts tests/resume-job-matcher.test.ts tests/gemini-analysis.test.ts tests/gemini-route.test.ts tests/resume-editor.test.ts tests/resume-export-route.test.ts tests/phase7.test.ts tests/security-remediation.test.ts"
+    "test": "node --conditions=react-server --import tsx --test tests/document-parser.test.ts tests/resume-route.test.ts tests/job-description-analysis.test.ts tests/resume-job-matcher.test.ts tests/gemini-analysis.test.ts tests/gemini-route.test.ts tests/resume-editor.test.ts tests/resume-export-route.test.ts tests/phase7.test.ts tests/security-remediation.test.ts tests/portfolio-demo.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.28.0",
